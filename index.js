@@ -8,11 +8,9 @@ require('dotenv').config();
 const PREFIX = process.env.BOT_PREFIX || '!';
 const LLAMA_API_KEY = process.env.LLAMA_API_KEY;
 const PORT = process.env.PORT || 3000;
-
-// Store conversation history per chat
 const chatHistory = new Map();
 
-// 1. Express server for Render health check
+// Express server for Render health check + QR viewing
 const app = express();
 app.use(express.json());
 
@@ -32,14 +30,14 @@ app.listen(PORT, () => {
     console.log(`Health server running on port ${PORT}`);
 });
 
-// 2. WhatsApp client setup for Render
+// WhatsApp client - fixed for Render
 const client = new Client({
     authStrategy: new LocalAuth({ 
-        clientId: "ai-bot",
-        dataPath: "/opt/render/project/src/.wwebjs_auth" // persistent on paid plan
+        clientId: "ai-bot"
     }),
     puppeteer: { 
         headless: true,
+        executablePath: process.env.PUPPETEER_EXECUTABLE_PATH,
         args: [
             '--no-sandbox',
             '--disable-setuid-sandbox',
@@ -55,12 +53,11 @@ const client = new Client({
 
 client.on('qr', async (qr) => {
     await qrcode.toFile('./qr.png', qr, { width: 400 });
-    console.log('QR code saved to qr.png. Visit https://your-app.onrender.com/qr to view it');
+    console.log('QR saved. Visit https://your-app.onrender.com/qr to scan');
 });
 
 client.on('ready', () => {
     console.log('✅ Bot is ready and connected!');
-    // Delete QR after ready
     if (fs.existsSync('./qr.png')) fs.unlinkSync('./qr.png');
 });
 
@@ -68,7 +65,6 @@ client.on('disconnected', (reason) => {
     console.log('Client disconnected:', reason);
 });
 
-// 3. Message handler
 client.on('message', async (message) => {
     try {
         if (message.fromMe) return;
