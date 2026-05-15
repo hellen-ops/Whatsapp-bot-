@@ -1,0 +1,20 @@
+{
+  "name": "whatsapp-bot-render",
+  "version": "1.0.0",
+  "description": "WhatsApp bot for Render",
+  "main": "index.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "axios": "^1.7.2",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "qrcode": "^1.5.3",
+    "whatsapp-web.js": "^1.24.4"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
